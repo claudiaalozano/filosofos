@@ -1,44 +1,25 @@
-from tkinter import *
+import tkinter as tk
 from filosofos import *
 
-root= Tk()
-root.geometry("600x600")
 
-
-
-class interfaz(root.Tk):
+class Interface(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Cena de los filosofos")
-        self.geometry("600x600")
-        self.id = []
-        self.forks = [threading.Lock() for n in range(5)]
+        self.title("Cena de filosofos")
+        self.geometry("800x600")
+        self.canvas = tk.Canvas(self, width=800, height=600)
+        self.canvas.pack()
 
-        for i in range(5):
-            self.id.append(i)
-            self.id[i] = filosofo()
-            self.id[i].start()
-        
-        start_button = root.Button(self, text="Start", command=self.start.filosofo())
-        start_button.pack()
+        x= 400
+        y= 300
+        angulo_inicial = -90
+        angulo_incremento = 360/n
 
-        stop_button = root.Button(self, text="Stop", command=self.stop.filosofo())
-        stop_button.pack()
+        self.filosofos = []
 
-        self.filosofo=[]
+        for i in range(n):
+            x_pos = x + 150 * tk.cos 
 
-    def start(self):
-        for i in range(5):
-            f= filosofo(f"Filosofo {i}", self.forks[i], self.forks[(i+1)%5])
-            f.start()
-            self.filosofo.append(f)
-    
-    def stop(self):
-        for f in self.filosofo:
-            f.is_running = False
-
-app = interfaz()
-app.mainloop()
-
-
-
+if __name__ == "__main__":
+    interface = Interface()
+    interface.mainloop()
