@@ -4,9 +4,7 @@ from filosofos import *
 root= Tk()
 root.geometry("600x600")
 
-tittle = Label(root, text="Cena de los filosofos", font=("Arial", 20)).place(x=150, y=10)
-tittle.config(font=17)
-tittle.pack(pady=2)
+
 
 class interfaz(root.Tk):
     def __init__(self):
@@ -34,5 +32,13 @@ class interfaz(root.Tk):
             f= filosofo(f"Filosofo {i}", self.forks[i], self.forks[(i+1)%5])
             f.start()
             self.filosofo.append(f)
+    
+    def stop(self):
+        for f in self.filosofo:
+            f.is_running = False
+
+app = interfaz()
+app.mainloop()
+
 
 
