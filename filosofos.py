@@ -2,6 +2,7 @@
 import threading
 import time
 import random
+import tkinter as tk
 
 n= 5
 tiempo_total=3
@@ -12,12 +13,17 @@ class filosofo(threading.Thread):
     tenedores = []
     count=0
 
-    def __init__(self):
+    def __init__(self, canvas, x, y):
         super().__init__()
         self.id = filosofo.count
         filosofo.count += 1
         filosofo.estado.append('PENSANDO')
         filosofo.tenedores.append(threading.Semaphore(0))
+        self.canvas = canvas
+        self.x = x
+        self.y = y
+        self.circle = self.canvas.create_oval(self.x-25, self.y-25, self.x+25, self.y+25, fill="white", outline="black")
+        self.label = self.canvas.create_text(self.x, self.y, text="Filosofo {}".format(self.id))
         print("Filosofo {} pensando".format(self.id))
 
     def __del__(self):

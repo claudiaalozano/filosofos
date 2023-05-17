@@ -1,5 +1,6 @@
 import tkinter as tk
 from filosofos import *
+import math
 
 
 class Interface(tk.Tk):
@@ -18,7 +19,7 @@ class Interface(tk.Tk):
         self.filosofos = []
 
         for i in range(n):
-            x_pos = x + 150 * tk.cos 
+            x_pos = x + 150 * math.cos(math.radians(angulo_inicial + angulo_incremento * i))
 
 if __name__ == "__main__":
     interface = Interface()
