@@ -1,5 +1,5 @@
 # filosofos
-Mi dirección de Github:
+Mi dirección de Github: https://github.com/claudiaalozano/filosofos.git
 
 En este proyecto he realizado un código para la cena de los filósofos.
 El código empleado es:
