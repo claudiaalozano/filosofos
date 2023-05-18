@@ -4,6 +4,7 @@ import time
 import random
 import tkinter as tk
 
+
 n= 5
 tiempo_total=3
 
@@ -102,9 +103,56 @@ class filosofo(threading.Thread):
             self.log_box.insert(tk.END, "Filosofo {} termino de comer".format(self.id))
 
     def run(self):
-        
-        for i in range(tiempo_total):
+
+        while self.shared_contador < n:
             self.pensar()
-            self.tomar_tenedores()
+            if not self.cenas_terminadas:
+                self.tomar_tenedores()
             self.comer()
-            self.soltar()
+            if not self.cenas_terminadas:
+                self.soltar()
+            if self.filosofo_contador[self.id] >= self.max_cenas and not self.cenas_terminadas:
+                self.cenas_terminadas = True
+                with self.contador_lock:
+                    self.shared_contador += 1
+        
+        if self.shared_contador == n:
+            self.root.quit()
+
+def main():
+    root = tk.Tk()
+    root.title("Cena de Filosofos")
+
+    log_box = tk.Text(root)
+    log_box.pack()
+
+    filosofo_labels = []
+    filosofo_contador = []
+    fork_labels = []
+    for i in range(n):
+        filosofo_label= tk.Label(root, text="Filosofo {}: PENSANDO (esperando), contador: 0".format(i))
+        filosofo_label.pack()
+        filosofo_labels.append(filosofo_label)
+        filosofo_contador.append(0)
+        fork_label = tk.Label(root, text="Tenedor {}: LIBRE".format(i))
+        fork_label.pack()
+        fork_labels.append(fork_label)
+    
+    shared_contador = 0
+    contador_lock = threading.Lock()
+
+    filosofos = []
+    for i in range(n):
+        f=filosofo(log_box, filosofo_labels, filosofo_contador, fork_labels, shared_contador, contador_lock, root)
+        filosofos.append(f)
+        f.start()
+    
+    def update_log_box():
+        for f in filosofos:
+            f.join()
+
+        root.destroy()
+
+    threading.Thread(target=update_log_box).start()
+    root.mainloop()
+    
