@@ -12,6 +12,7 @@ class filosofo(threading.Thread):
     estado = []
     tenedores = []
     count=0
+    cenas_completadas=0
 
     def __init__(self, canvas, x, y):
         super().__init__()
