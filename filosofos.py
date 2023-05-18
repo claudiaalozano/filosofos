@@ -14,17 +14,22 @@ class filosofo(threading.Thread):
     count=0
     cenas_completadas=0
 
-    def __init__(self, canvas, x, y):
+    def __init__(self, log_box, filosofo_labels, filosofo_contador, fork_labels, shared_contador, contador_lock, root):
         super().__init__()
         self.id = filosofo.count
         filosofo.count += 1
         filosofo.estado.append('PENSANDO')
         filosofo.tenedores.append(threading.Semaphore(0))
-        self.canvas = canvas
-        self.x = x
-        self.y = y
-        self.circle = self.canvas.create_oval(self.x-25, self.y-25, self.x+25, self.y+25, fill="white", outline="black")
-        self.label = self.canvas.create_text(self.x, self.y, text="Filosofo {}".format(self.id))
+        
+        self.log_box = log_box
+        self.filosofo_labels = filosofo_labels
+        self.filosofo_contador = filosofo_contador
+        self.fork_labels = fork_labels
+        self.max_cenas = 5
+        self.shared_contador = shared_contador
+        self.cenas_terminadas = False
+        self.contador_lock = contador_lock
+        self.root = root
         print("Filosofo {} pensando".format(self.id))
 
     def __del__(self):
