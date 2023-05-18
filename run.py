@@ -1,5 +1,4 @@
-from main import *
-from interface import *
+from filosofos import *
 if __name__ == '__main__':
     main()
     
