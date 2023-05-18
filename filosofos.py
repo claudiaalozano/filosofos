@@ -35,6 +35,22 @@ class filosofo(threading.Thread):
     def __del__(self):
         print("Filosofo {} se para de la mesa".format(self.id))
 
+    def log(self, message):
+        self.log_box.insert(tk.END, message + "\n")
+        self.log_box.see(tk.END)
+    
+    def update_filosofo_labels(self):
+        for i in range(n):
+            filosofo_state = filosofo.estado[i]
+            filosofo_status = "comiendo" if filosofo_state == "COMIENDO" else "pensando"
+            filosofo_texto="Filosofo {}: {} ({}), contador: {}".format(i, filosofo_state, filosofo_status, self.filosofo_contador[i])
+            self.filosofo_labels[i].configure(text=filosofo_texto)
+    def update_fork_labels(self):
+        for i in range (n):
+            fork_state = "USANDO" if filosofo.estado[i] == "COMIENDO" else "LIBRE"
+            fork_text = "Tenedor {}: {}".format(i, fork_state)
+            self.fork_labels[i].configure(text=fork_text)
+
     def pensar(self):
         time.sleep(random.randint(0,5))
     
@@ -45,30 +61,48 @@ class filosofo(threading.Thread):
         return (i+1)%n
     
     def verificar(self,i):
-        if filosofo.estado[i] == 'HAMBRIENTO' and filosofo.estado[self.izquierda(i)] != 'COMIENDO' and filosofo.estado[self.derecha(i)] != 'COMIENDO':
+        if self.filosofo_contador[self.id] >= self.max_cenas and not self.cenas_terminadas and filosofo.estado=="HAMBRIENTO" and filosofo.estado[self.izquierda(i)] != 'COMIENDO' and filosofo.estado[self.derecha(i)] != 'COMIENDO':
             filosofo.estado[i] = 'COMIENDO'
             filosofo.tenedores[i].release()
+            with self.contador_lock:
+                self.filosofo_contador[self.id] += 1
+            self.update_filosofo_labels()
+        elif self.filosofo_contador[self.id] >= self.max_cenas and not self.cenas_terminadas and self.shared_contador< n:
+            self.log("Filosofo{} ha alcanzado el número máximo de cenas. Esperando a los demás...".format(self.id))
+            self.cenas_terminadas = True
+            
+            
 
     def tomar_tenedores(self):
-        filosofo.mutex.acquire()
-        filosofo.estado[self.id] = 'HAMBRIENTO'
-        self.verificar(self.id)
-        filosofo.mutex.release()
-        filosofo.tenedores[self.id].acquire()
+        if self.filosofo_contador[self.id]< self.max_cenas :
+
+            
+            filosofo.mutex.acquire()
+            filosofo.estado[self.id] = 'HAMBRIENTO'
+            self.update_filosofo_labels()
+            self.update_fork_labels()
+            self.verificar(self.id)
+            filosofo.mutex.release()
+            filosofo.tenedores[self.id].acquire()
     
     def soltar(self):
-        filosofo.mutex.acquire()
-        filosofo.estado[self.id] = 'PENSANDO'
-        self.verificar(self.izquierda(self.id))
-        self.verificar(self.derecha(self.id))
-        filosofo.mutex.release()
+        if self.filosofo_contador[self.id] < self.max_cenas:
+            filosofo.mutex.acquire()
+            filosofo.estado[self.id] = 'PENSANDO'
+            self.update_filosofo_labels()
+            self.update_fork_labels()
+            self.verificar(self.izquierda(self.id))
+            self.verificar(self.derecha(self.id))
+            filosofo.mutex.release()
 
     def comer(self):
-        print("Filosofo {} comiendo".format(self.id))
-        time.sleep(random.randint(0,5))
-        print("Filosofo {} termino de comer".format(self.id))
+        if self.filosofo_contador[self.id] < self.max_cenas:
+            self.log_box.insert(tk.END, "Filosofo {} comiendo".format(self.id))
+            time.sleep(random.randint(0,5))
+            self.log_box.insert(tk.END, "Filosofo {} termino de comer".format(self.id))
 
     def run(self):
+        
         for i in range(tiempo_total):
             self.pensar()
             self.tomar_tenedores()
